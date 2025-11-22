@@ -1,6 +1,5 @@
 # Docker
 Dockerfile
-nginx.conf
 .dockerignore
 
 # Git

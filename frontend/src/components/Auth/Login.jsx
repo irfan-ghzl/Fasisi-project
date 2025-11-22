@@ -32,7 +32,7 @@ function Login({ onLogin }) {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
-          <h1>❤️ Dating App</h1>
+          <h1>❤️ Fasisi App</h1>
           <p>Platform Khusus untuk Kami Berdua</p>
         </div>
 
