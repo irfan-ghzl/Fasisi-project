@@ -41,7 +41,7 @@ exports.createRequest = async (req, res) => {
       const requestId = this.lastID;
 
       // Create notification for the partner
-      db.all('SELECT * FROM users WHERE id != ?', [req.user.id], async (err, users) => {
+      db.all('SELECT id, email, phone, username FROM users WHERE id != ?', [req.user.id], async (err, users) => {
         if (!err && users.length > 0) {
           for (const user of users) {
             const notificationMessage = `${req.user.username} membuat request ${request_type === 'place' ? 'tempat' : 'makanan'}: ${title}`;

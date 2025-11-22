@@ -7,8 +7,14 @@ function authMiddleware(req, res, next) {
     return res.status(401).json({ error: 'Authentication required' });
   }
 
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) {
+    console.error('JWT_SECRET is not configured');
+    return res.status(500).json({ error: 'Server configuration error' });
+  }
+
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default-secret');
+    const decoded = jwt.verify(token, jwtSecret);
     req.user = decoded;
     next();
   } catch (error) {

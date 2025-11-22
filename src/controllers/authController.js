@@ -13,6 +13,12 @@ exports.register = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      console.error('JWT_SECRET is not configured');
+      return res.status(500).json({ error: 'Server configuration error' });
+    }
+
     db.run(
       'INSERT INTO users (username, email, phone, password_hash) VALUES (?, ?, ?, ?)',
       [username, email, phone, hashedPassword],
@@ -26,7 +32,7 @@ exports.register = async (req, res) => {
 
         const token = jwt.sign(
           { id: this.lastID, username, email },
-          process.env.JWT_SECRET || 'default-secret',
+          jwtSecret,
           { expiresIn: '7d' }
         );
 
@@ -66,9 +72,15 @@ exports.login = async (req, res) => {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
 
+      const jwtSecret = process.env.JWT_SECRET;
+      if (!jwtSecret) {
+        console.error('JWT_SECRET is not configured');
+        return res.status(500).json({ error: 'Server configuration error' });
+      }
+
       const token = jwt.sign(
         { id: user.id, username: user.username, email: user.email },
-        process.env.JWT_SECRET || 'default-secret',
+        jwtSecret,
         { expiresIn: '7d' }
       );
 

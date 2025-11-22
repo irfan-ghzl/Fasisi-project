@@ -7,6 +7,13 @@ const socketIo = require('socket.io');
 const path = require('path');
 const db = require('./src/config/database');
 
+// Check required environment variables
+if (!process.env.JWT_SECRET) {
+  console.error('FATAL ERROR: JWT_SECRET is not defined in environment variables.');
+  console.error('Please create a .env file based on .env.example and set JWT_SECRET.');
+  process.exit(1);
+}
+
 // Import routes
 const authRoutes = require('./src/routes/auth');
 const galleryRoutes = require('./src/routes/gallery');
