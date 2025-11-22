@@ -1,6 +1,39 @@
 # Dating Web Application - Fasisi Project
 
-Platform dating khusus untuk pasangan dengan fitur lengkap untuk menyimpan kenangan, merencanakan kencan, dan berkomunikasi.
+Platform dating khusus untuk Irfan dan Sisti dengan fitur lengkap untuk menyimpan kenangan, merencanakan kencan, dan berkomunikasi.
+
+## 🏗️ Architecture
+
+This project now has **TWO BACKENDS**:
+
+### 1. **Golang Backend (NEW)** - DDD with PostgreSQL
+- Location: `backend-go/`
+- Architecture: Domain-Driven Design (DDD)
+- Database: PostgreSQL
+- Fixed users: **Irfan (super admin)** and **Sisti (user)**
+- Language: Go 1.21+
+- [See backend-go/README.md for details](./backend-go/README.md)
+
+### 2. **Node.js Backend (Legacy)** - Express with SQLite
+- Location: `server.js`, `src/`
+- Architecture: MVC
+- Database: SQLite
+- Language: Node.js
+- Frontend: `views/`, `public/`
+
+## 👥 Fixed Users
+
+This system is designed for **only two users**:
+
+1. **Irfan** (Super Admin)
+   - Email: `irfan@fasisi.com`
+   - Role: `super_admin`
+   - Can delete any content and manage all features
+
+2. **Sisti** (User)
+   - Email: `sisti@fasisi.com`
+   - Role: `user`
+   - Can create and manage own content
 
 ## ✨ Fitur
 
