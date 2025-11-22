@@ -49,9 +49,9 @@ This system is designed for only two users:
 
 ## 🚀 Getting Started
 
-### Option 1: Docker (Recommended)
+### Option 1: Docker Compose (Recommended)
 
-**Easiest way to run the application:**
+**Run all services together (PostgreSQL + Backend + Frontend):**
 
 ```bash
 # From project root
@@ -69,17 +69,131 @@ docker compose logs -f backend
 docker compose down
 ```
 
-**Using Makefile (from project root):**
+### Option 2: Docker Backend Only
+
+**Run only the backend with Docker** (requires PostgreSQL already running):
+
+**Step 1: Setup PostgreSQL** (skip if already running)
+
 ```bash
-make up      # Start all services
-make logs    # View logs
-make down    # Stop services
-make help    # Show all commands
+# Run PostgreSQL in Docker
+docker run -d \
+  --name fasisi-postgres \
+  -e POSTGRES_USER=fasisi_user \
+  -e POSTGRES_PASSWORD=your_password \
+  -e POSTGRES_DB=fasisi_db \
+  -p 5432:5432 \
+  postgres:15-alpine
+
+# Check if PostgreSQL is running
+docker ps | grep fasisi-postgres
 ```
 
-See [DOCKER.md](../DOCKER.md) in project root for complete guide.
+**Step 2: Configure Backend Environment**
 
-### Option 2: Manual Installation
+```bash
+cd backend
+cp .env.example .env
+```
+
+Edit `.env` file:
+```env
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=fasisi_user
+DB_PASSWORD=your_password
+DB_NAME=fasisi_db
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+PORT=8080
+```
+
+**Step 3: Build Backend Docker Image**
+
+```bash
+# From backend directory
+docker build -t fasisi-backend .
+```
+
+**Step 4: Run Backend Container**
+
+```bash
+# Run backend container
+docker run -d \
+  --name fasisi-backend \
+  -p 8080:8080 \
+  --env-file .env \
+  --network host \
+  fasisi-backend
+
+# Or if using bridge network (connect to postgres container)
+docker run -d \
+  --name fasisi-backend \
+  -p 8080:8080 \
+  -e DB_HOST=fasisi-postgres \
+  -e DB_PORT=5432 \
+  -e DB_USER=fasisi_user \
+  -e DB_PASSWORD=your_password \
+  -e DB_NAME=fasisi_db \
+  -e JWT_SECRET=your-secret-key \
+  --link fasisi-postgres:postgres \
+  fasisi-backend
+```
+
+**Step 5: Verify Backend is Running**
+
+```bash
+# Check container logs
+docker logs -f fasisi-backend
+
+# Test API
+curl http://localhost:8080/api/health
+
+# Should return: {"status":"ok","database":"connected"}
+```
+
+**Managing Backend Container:**
+
+```bash
+# View logs
+docker logs fasisi-backend
+
+# Follow logs
+docker logs -f fasisi-backend
+
+# Stop backend
+docker stop fasisi-backend
+
+# Start backend
+docker start fasisi-backend
+
+# Restart backend
+docker restart fasisi-backend
+
+# Remove backend container
+docker rm -f fasisi-backend
+
+# Rebuild and run
+docker build -t fasisi-backend . && \
+docker rm -f fasisi-backend && \
+docker run -d --name fasisi-backend -p 8080:8080 --env-file .env --network host fasisi-backend
+```
+
+**Testing the Backend:**
+
+```bash
+# Health check
+curl http://localhost:8080/api/health
+
+# Login test
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"irfan@fasisi.com","password":"irfan123"}'
+
+# Expected response:
+# {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...","user":{...}}
+```
+
+### Option 3: Manual Installation (Without Docker)
 
 ### Prerequisites
 

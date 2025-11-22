@@ -37,7 +37,128 @@ frontend/
 
 ## 🚀 Quick Start
 
-### Development
+### Option 1: Docker Compose (Recommended)
+
+**Run all services together (PostgreSQL + Backend + Frontend):**
+
+```bash
+# From project root
+cd ..
+docker compose up -d
+
+# Access the application
+# - Frontend: http://localhost:3000
+# - Backend API: http://localhost:8080
+
+# View logs
+docker compose logs -f frontend
+
+# Stop services
+docker compose down
+```
+
+### Option 2: Docker Frontend Only
+
+**Run only the frontend with Docker** (requires backend already running at http://localhost:8080):
+
+**Step 1: Build Frontend Docker Image**
+
+```bash
+# From frontend directory
+docker build -t fasisi-frontend .
+```
+
+The build process:
+1. Stage 1 (build): Installs dependencies and builds React app with Vite
+2. Stage 2 (production): Copies built files to Nginx Alpine image
+
+**Step 2: Run Frontend Container**
+
+```bash
+# Run frontend container
+docker run -d \
+  --name fasisi-frontend \
+  -p 3000:80 \
+  fasisi-frontend
+```
+
+**With custom backend URL:**
+
+```bash
+# If backend is on different host/port
+docker run -d \
+  --name fasisi-frontend \
+  -p 3000:80 \
+  -e VITE_API_BASE_URL=http://your-backend-host:8080 \
+  fasisi-frontend
+```
+
+**Step 3: Verify Frontend is Running**
+
+```bash
+# Check container logs
+docker logs fasisi-frontend
+
+# Open browser
+# http://localhost:3000
+```
+
+**Managing Frontend Container:**
+
+```bash
+# View logs
+docker logs fasisi-frontend
+
+# Follow logs
+docker logs -f fasisi-frontend
+
+# Stop frontend
+docker stop fasisi-frontend
+
+# Start frontend
+docker start fasisi-frontend
+
+# Restart frontend
+docker restart fasisi-frontend
+
+# Remove frontend container
+docker rm -f fasisi-frontend
+
+# Rebuild and run
+docker build -t fasisi-frontend . && \
+docker rm -f fasisi-frontend && \
+docker run -d --name fasisi-frontend -p 3000:80 fasisi-frontend
+```
+
+**Frontend + Backend in Docker Network:**
+
+If running both frontend and backend in Docker, create a network:
+
+```bash
+# Create network
+docker network create fasisi-network
+
+# Run backend on network
+docker run -d \
+  --name fasisi-backend \
+  --network fasisi-network \
+  -p 8080:8080 \
+  --env-file backend/.env \
+  fasisi-backend
+
+# Run frontend on same network
+docker run -d \
+  --name fasisi-frontend \
+  --network fasisi-network \
+  -p 3000:80 \
+  fasisi-frontend
+
+# Frontend will communicate with backend via http://fasisi-backend:8080
+```
+
+### Option 3: Development Mode (Without Docker)
+
+**Local development with hot reload:**
 
 ```bash
 cd frontend
@@ -47,7 +168,9 @@ npm run dev
 
 Server akan berjalan di http://localhost:3000
 
-### Build Production
+### Option 4: Production Build (Without Docker)
+
+**Build for production:**
 
 ```bash
 npm run build
@@ -55,26 +178,21 @@ npm run build
 
 Output akan ada di folder `dist/`
 
-### Preview Production Build
+**Preview production build:**
 
 ```bash
 npm run preview
 ```
 
-## 🐳 Docker
-
-Build dan run dengan Docker:
+**Serve with simple HTTP server:**
 
 ```bash
-docker build -t fasisi-frontend .
-docker run -p 3000:80 fasisi-frontend
-```
+# Using npx
+npx serve -s dist -l 3000
 
-Atau gunakan docker-compose dari root project:
-
-```bash
-cd ..
-docker compose up -d
+# Or install serve globally
+npm install -g serve
+serve -s dist -l 3000
 ```
 
 ## 🔧 Configuration
