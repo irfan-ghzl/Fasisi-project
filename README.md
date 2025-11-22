@@ -33,9 +33,9 @@ Project ini memiliki **2 folder utama**:
 ### 1. **Backend** (`backend/`) - Golang dengan DDD
 - **Language**: Go 1.21+
 - **Architecture**: Domain-Driven Design (DDD)
-- **Database**: PostgreSQL 15
+- **Database**: PostgreSQL 15 dengan migration system
 - **Port**: 8080
-- **Features**: JWT auth, repository pattern, super admin
+- **Features**: JWT auth, repository pattern, super admin, embedded migrations
 
 [📖 Dokumentasi Backend](./backend/README.md)
 

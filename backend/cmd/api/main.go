@@ -34,11 +34,13 @@ func main() {
 	}
 	defer db.Close()
 
-	// Initialize schema
+	// Run database migrations
 	ctx := context.Background()
-	if err := db.InitSchema(ctx); err != nil {
-		log.Fatal("Failed to initialize schema:", err)
+	log.Println("Running database migrations...")
+	if err := db.RunMigrations(ctx); err != nil {
+		log.Fatal("Failed to run migrations:", err)
 	}
+	log.Println("Database migrations completed successfully")
 
 	// Initialize fixed users (Irfan and Sisti)
 	if err := initializeUsers(ctx, db); err != nil {

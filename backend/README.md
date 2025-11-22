@@ -139,13 +139,22 @@ The server will start on `http://localhost:8080`
 
 ### Database Schema
 
-The application automatically creates the following tables:
+The application uses an embedded migration system that automatically creates and manages the database schema. Migrations are embedded in the binary and run automatically on startup.
 
+**Migration Files:**
+- Located in: `internal/infrastructure/database/migrations/`
+- Embedded in the binary using Go's `embed` package
+- Automatically executed on application start
+
+**Database Tables:**
+- `schema_migrations` - Tracks applied migrations
 - `users` - User accounts (only Irfan and Sisti)
 - `gallery` - Photos and videos
 - `date_requests` - Date planning requests
 - `chat_messages` - Chat messages between users
 - `notifications` - System notifications
+
+**See** `internal/infrastructure/database/migrations/README.md` for detailed migration documentation.
 
 ## 📡 API Endpoints
 
