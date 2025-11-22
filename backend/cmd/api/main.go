@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/irfan-ghzl/fasisi-backend/config"
 	"github.com/irfan-ghzl/fasisi-backend/internal/domain/entity"
@@ -41,6 +42,12 @@ func main() {
 		log.Fatal("Failed to run migrations:", err)
 	}
 	log.Println("Database migrations completed successfully")
+
+	// Create uploads directory if it doesn't exist
+	if err := os.MkdirAll("./uploads", 0755); err != nil {
+		log.Fatal("Failed to create uploads directory:", err)
+	}
+	log.Println("Uploads directory ready")
 
 	// Initialize fixed users (Irfan and Sisti)
 	if err := initializeUsers(ctx, db); err != nil {

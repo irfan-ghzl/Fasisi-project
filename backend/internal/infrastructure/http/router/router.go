@@ -49,5 +49,9 @@ func SetupRoutes(
 	r.Handle("/api/chat/messages/read", authMiddleware(http.HandlerFunc(chatHandler.MarkAsRead))).Methods("POST")
 	r.Handle("/api/chat/unread", authMiddleware(http.HandlerFunc(chatHandler.GetUnreadCount))).Methods("GET")
 
+	// Static files for uploads (gallery photos/videos)
+	// Serve files from ./uploads directory at /uploads URL path
+	r.PathPrefix("/uploads/").Handler(http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads"))))
+
 	return r
 }

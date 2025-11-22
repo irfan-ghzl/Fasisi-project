@@ -25,6 +25,8 @@ Thumbs.db
 # Backend (Go)
 backend/bin/
 backend/vendor/
+backend/uploads/
+uploads/
 
 # Frontend (React)
 frontend/node_modules/
