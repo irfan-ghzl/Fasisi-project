@@ -52,6 +52,7 @@ func main() {
 	galleryRepo := database.NewGalleryRepository(db)
 	requestRepo := database.NewDateRequestRepository(db)
 	notifRepo := database.NewNotificationRepository(db)
+	chatRepo := database.NewChatRepository(db)
 
 	// Initialize services
 	authService := service.NewAuthService(cfg.JWTSecret)
@@ -60,11 +61,12 @@ func main() {
 	authHandler := handler.NewAuthHandler(userRepo, authService)
 	galleryHandler := handler.NewGalleryHandler(galleryRepo)
 	requestHandler := handler.NewRequestHandler(requestRepo, notifRepo)
+	chatHandler := handler.NewChatHandler(chatRepo)
 
 	// Setup routes
 	authMiddleware := middleware.AuthMiddleware(authService)
 	adminMiddleware := middleware.AdminMiddleware
-	r := router.SetupRoutes(authHandler, galleryHandler, requestHandler, authMiddleware, adminMiddleware)
+	r := router.SetupRoutes(authHandler, galleryHandler, requestHandler, chatHandler, authMiddleware, adminMiddleware)
 
 	// Start server
 	log.Printf("Server starting on port %s", cfg.ServerPort)

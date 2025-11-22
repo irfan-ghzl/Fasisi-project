@@ -13,6 +13,7 @@ func SetupRoutes(
 	authHandler *handler.AuthHandler,
 	galleryHandler *handler.GalleryHandler,
 	requestHandler *handler.RequestHandler,
+	chatHandler *handler.ChatHandler,
 	authMiddleware func(http.Handler) http.Handler,
 	adminMiddleware func(http.Handler) http.Handler,
 ) *mux.Router {
@@ -41,6 +42,12 @@ func SetupRoutes(
 	r.Handle("/api/requests", authMiddleware(http.HandlerFunc(requestHandler.Create))).Methods("POST")
 	r.Handle("/api/requests/{id}/status", authMiddleware(http.HandlerFunc(requestHandler.UpdateStatus))).Methods("PATCH")
 	r.Handle("/api/requests/{id}", authMiddleware(http.HandlerFunc(requestHandler.Delete))).Methods("DELETE")
+
+	// Chat routes
+	r.Handle("/api/chat/messages", authMiddleware(http.HandlerFunc(chatHandler.GetHistory))).Methods("GET")
+	r.Handle("/api/chat/messages", authMiddleware(http.HandlerFunc(chatHandler.SendMessage))).Methods("POST")
+	r.Handle("/api/chat/messages/read", authMiddleware(http.HandlerFunc(chatHandler.MarkAsRead))).Methods("POST")
+	r.Handle("/api/chat/unread", authMiddleware(http.HandlerFunc(chatHandler.GetUnreadCount))).Methods("GET")
 
 	return r
 }
