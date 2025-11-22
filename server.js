@@ -50,12 +50,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Apply rate limiting
-app.use('/api/auth', authLimiter);
+// Apply rate limiting (more specific routes first)
+app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/', apiLimiter);
 
 // API Routes
-app.use('/api/auth', authRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/requests', requestRoutes);
 app.use('/api/chat', chatRoutes);
