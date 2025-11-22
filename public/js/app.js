@@ -311,22 +311,31 @@ function setupAppListeners() {
 
 // Initialize Socket.io
 function initializeSocket() {
-  socket = io();
-  
-  socket.on('connect', () => {
-    console.log('Connected to socket server');
-    socket.emit('register', currentUser.id);
-  });
+  try {
+    if (typeof io === 'undefined') {
+      console.warn('Socket.io not available, real-time features will be disabled');
+      return;
+    }
+    
+    socket = io();
+    
+    socket.on('connect', () => {
+      console.log('Connected to socket server');
+      socket.emit('register', currentUser.id);
+    });
 
-  socket.on('receiveMessage', (data) => {
-    console.log('New message received:', data);
-    loadChat();
-    loadChatUnreadCount();
-  });
+    socket.on('receiveMessage', (data) => {
+      console.log('New message received:', data);
+      loadChat();
+      loadChatUnreadCount();
+    });
 
-  socket.on('userTyping', (data) => {
-    console.log('User typing:', data);
-  });
+    socket.on('userTyping', (data) => {
+      console.log('User typing:', data);
+    });
+  } catch (error) {
+    console.error('Socket.io initialization error:', error);
+  }
 }
 
 // Load gallery
