@@ -19,10 +19,10 @@ services:
     networks:
       - fasisi-network
 
-  # Golang Backend API
+  # Golang Backend API (DDD)
   backend:
     build:
-      context: ./backend-go
+      context: ./backend
       dockerfile: Dockerfile
     container_name: fasisi-backend
     environment:
@@ -42,36 +42,16 @@ services:
       - fasisi-network
     restart: unless-stopped
 
-  # Frontend Application (New - Vite)
+  # React Frontend
   frontend:
     build:
-      context: ./frontend-app
+      context: ./frontend
       dockerfile: Dockerfile
     container_name: fasisi-frontend
     ports:
       - "3000:80"
     depends_on:
       - backend
-    networks:
-      - fasisi-network
-    restart: unless-stopped
-
-  # Legacy Frontend (Node.js)
-  frontend-legacy:
-    image: node:18-alpine
-    container_name: fasisi-frontend-legacy
-    working_dir: /app
-    volumes:
-      - ./:/app
-      - /app/node_modules
-      - /app/backend-go
-      - /app/frontend-app
-    environment:
-      PORT: 3001
-      JWT_SECRET: dev-secret-key-change-in-production
-    ports:
-      - "3001:3001"
-    command: sh -c "npm install && PORT=3001 npm start"
     networks:
       - fasisi-network
     restart: unless-stopped

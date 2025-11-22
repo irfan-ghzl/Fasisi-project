@@ -1,6 +1,5 @@
 # Dependencies
 node_modules/
-package-lock.json
 
 # Environment variables
 .env
@@ -8,10 +7,6 @@ package-lock.json
 # Database
 *.sqlite
 *.db
-
-# Uploads
-public/uploads/*
-!public/uploads/.gitkeep
 
 # Logs
 logs/
@@ -27,11 +22,11 @@ Thumbs.db
 *.swp
 *.swo
 
-# Go
-backend-go/bin/
-backend-go/vendor/
+# Backend (Go)
+backend/bin/
+backend/vendor/
 
-# Frontend
-frontend-app/node_modules/
-frontend-app/dist/
-frontend-app/.env
+# Frontend (React)
+frontend/node_modules/
+frontend/dist/
+frontend/.env

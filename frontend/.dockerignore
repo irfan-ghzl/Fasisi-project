@@ -1,0 +1,33 @@
+# Docker
+Dockerfile
+nginx.conf
+.dockerignore
+
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+
+# CI/CD
+.github/
+
+# IDE
+.vscode/
+.idea/
+
+# Testing
+**/*.test.js
+**/*.spec.js
+**/*.test.jsx
+**/*.spec.jsx
+coverage/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
