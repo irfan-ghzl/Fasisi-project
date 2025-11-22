@@ -2,6 +2,32 @@
 
 Platform dating khusus untuk Irfan dan Sisti dengan fitur lengkap untuk menyimpan kenangan, merencanakan kencan, dan berkomunikasi.
 
+## 🚀 Quick Start with Docker
+
+**Recommended way to run the application locally:**
+
+```bash
+# Start all services (PostgreSQL + Golang Backend + Frontend)
+docker-compose up -d
+
+# Access the application
+# - Backend API: http://localhost:8080
+# - Frontend: http://localhost:3000
+# - Health check: http://localhost:8080/api/health
+
+# View logs
+docker-compose logs -f
+
+# Stop all services
+docker-compose down
+```
+
+**Default Login:**
+- Irfan: `irfan@fasisi.com` / `irfan123` (super admin)
+- Sisti: `sisti@fasisi.com` / `sisti123` (user)
+
+📖 **[See DOCKER.md for complete Docker guide](./DOCKER.md)**
+
 ## 🏗️ Architecture
 
 This project now has **TWO BACKENDS**:

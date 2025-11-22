@@ -1,0 +1,70 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: fasisi-postgres
+    environment:
+      POSTGRES_USER: fasisi_user
+      POSTGRES_PASSWORD: fasisi_password
+      POSTGRES_DB: fasisi_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fasisi_user -d fasisi_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fasisi-network
+
+  # Golang Backend API
+  backend:
+    build:
+      context: ./backend-go
+      dockerfile: Dockerfile
+    container_name: fasisi-backend
+    environment:
+      PORT: 8080
+      JWT_SECRET: dev-secret-key-change-in-production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: fasisi_user
+      DB_PASSWORD: fasisi_password
+      DB_NAME: fasisi_db
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - fasisi-network
+    restart: unless-stopped
+
+  # Frontend (Node.js - Legacy)
+  frontend:
+    image: node:18-alpine
+    container_name: fasisi-frontend
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - /app/node_modules
+      - /app/backend-go
+    environment:
+      PORT: 3000
+      JWT_SECRET: dev-secret-key-change-in-production
+    ports:
+      - "3000:3000"
+    command: sh -c "npm install && npm start"
+    networks:
+      - fasisi-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  fasisi-network:
+    driver: bridge

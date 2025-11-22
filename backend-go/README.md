@@ -49,6 +49,38 @@ This system is designed for only two users:
 
 ## 🚀 Getting Started
 
+### Option 1: Docker (Recommended)
+
+**Easiest way to run the application:**
+
+```bash
+# From project root
+docker compose up -d
+
+# Access the application
+# - Backend API: http://localhost:8080
+# - Frontend: http://localhost:3000
+# - Health check: http://localhost:8080/api/health
+
+# View logs
+docker compose logs -f backend
+
+# Stop services
+docker compose down
+```
+
+**Using Makefile (from project root):**
+```bash
+make up      # Start all services
+make logs    # View logs
+make down    # Stop services
+make help    # Show all commands
+```
+
+See [DOCKER.md](../DOCKER.md) in project root for complete guide.
+
+### Option 2: Manual Installation
+
 ### Prerequisites
 
 - Go 1.21 or higher
