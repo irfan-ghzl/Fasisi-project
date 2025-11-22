@@ -30,3 +30,8 @@ Thumbs.db
 # Go
 backend-go/bin/
 backend-go/vendor/
+
+# Frontend
+frontend-app/node_modules/
+frontend-app/dist/
+frontend-app/.env

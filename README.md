@@ -30,17 +30,26 @@ docker-compose down
 
 ## 🏗️ Architecture
 
-This project now has **TWO BACKENDS**:
+This project has **SEPARATE BACKEND AND FRONTEND**:
 
-### 1. **Golang Backend (NEW)** - DDD with PostgreSQL
+### 1. **Golang Backend** - DDD with PostgreSQL
 - Location: `backend-go/`
 - Architecture: Domain-Driven Design (DDD)
 - Database: PostgreSQL
 - Fixed users: **Irfan (super admin)** and **Sisti (user)**
 - Language: Go 1.21+
+- Port: 8080
 - [See backend-go/README.md for details](./backend-go/README.md)
 
-### 2. **Node.js Backend (Legacy)** - Express with SQLite
+### 2. **Frontend Application** - Vite + Vanilla JS
+- Location: `frontend-app/`
+- Build Tool: Vite (fast development & optimized builds)
+- Framework: Vanilla JavaScript (no dependencies)
+- Styling: Custom CSS with responsive design
+- Port: 3000 (nginx in production)
+- [See frontend-app/README.md for details](./frontend-app/README.md)
+
+### 3. **Node.js Backend (Legacy)** - Express with SQLite
 - Location: `server.js`, `src/`
 - Architecture: MVC
 - Database: SQLite
