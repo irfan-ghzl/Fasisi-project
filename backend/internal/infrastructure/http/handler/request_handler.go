@@ -42,7 +42,11 @@ type CreateRequestReq struct {
 }
 
 func (h *RequestHandler) Create(w http.ResponseWriter, r *http.Request) {
-	claims, _ := r.Context().Value("user").(*service.Claims)
+	claims, ok := r.Context().Value("user").(*service.Claims)
+	if !ok || claims == nil {
+		http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
+		return
+	}
 
 	var req CreateRequestReq
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -109,7 +113,11 @@ func (h *RequestHandler) UpdateStatus(w http.ResponseWriter, r *http.Request) {
 func (h *RequestHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, _ := strconv.ParseInt(vars["id"], 10, 64)
-	claims, _ := r.Context().Value("user").(*service.Claims)
+	claims, ok := r.Context().Value("user").(*service.Claims)
+	if !ok || claims == nil {
+		http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
+		return
+	}
 
 	// Check ownership or admin
 	dateReq, err := h.requestRepo.FindByID(r.Context(), id)

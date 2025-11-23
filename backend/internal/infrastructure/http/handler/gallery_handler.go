@@ -49,7 +49,11 @@ func (h *GalleryHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 // - Photos: JPEG, PNG, GIF
 // - Videos: MP4, MOV, AVI, WebM
 func (h *GalleryHandler) Create(w http.ResponseWriter, r *http.Request) {
-	claims, _ := r.Context().Value("user").(*service.Claims)
+	claims, ok := r.Context().Value("user").(*service.Claims)
+	if !ok || claims == nil {
+		http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
+		return
+	}
 
 	// Parse multipart form (50MB max)
 	err := r.ParseMultipartForm(50 << 20)
@@ -143,7 +147,11 @@ func (h *GalleryHandler) Create(w http.ResponseWriter, r *http.Request) {
 func (h *GalleryHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, _ := strconv.ParseInt(vars["id"], 10, 64)
-	claims, _ := r.Context().Value("user").(*service.Claims)
+	claims, ok := r.Context().Value("user").(*service.Claims)
+	if !ok || claims == nil {
+		http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
+		return
+	}
 
 	// Check ownership or admin
 	gallery, err := h.galleryRepo.FindByID(r.Context(), id)

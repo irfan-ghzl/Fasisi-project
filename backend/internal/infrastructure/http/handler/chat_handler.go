@@ -43,7 +43,11 @@ func NewChatHandler(chatRepo repository.ChatRepository) *ChatHandler {
 //   - 500 Internal Server Error: Gagal mengambil pesan dari database
 func (h *ChatHandler) GetHistory(w http.ResponseWriter, r *http.Request) {
 	// Ambil user claims dari context (sudah diset oleh auth middleware)
-	claims, _ := r.Context().Value("user").(*service.Claims)
+	claims, ok := r.Context().Value("user").(*service.Claims)
+	if !ok || claims == nil {
+		http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
+		return
+	}
 
 	// Tentukan partner ID
 	// Sistem ini hanya untuk 2 user: Irfan (ID=1) dan Sisti (ID=2)
@@ -92,7 +96,11 @@ type SendMessageReq struct {
 //   - 500 Internal Server Error: Gagal menyimpan pesan ke database
 func (h *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 	// Ambil user claims dari JWT token
-	claims, _ := r.Context().Value("user").(*service.Claims)
+	claims, ok := r.Context().Value("user").(*service.Claims)
+	if !ok || claims == nil {
+		http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
+		return
+	}
 
 	// Parse request body
 	var req SendMessageReq
@@ -154,7 +162,11 @@ func (h *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 //   - 500 Internal Server Error: Gagal update status pesan
 func (h *ChatHandler) MarkAsRead(w http.ResponseWriter, r *http.Request) {
 	// Ambil user claims dari JWT token
-	claims, _ := r.Context().Value("user").(*service.Claims)
+	claims, ok := r.Context().Value("user").(*service.Claims)
+	if !ok || claims == nil {
+		http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
+		return
+	}
 
 	// Tentukan partner ID
 	partnerID := int64(1)
@@ -196,7 +208,11 @@ func (h *ChatHandler) MarkAsRead(w http.ResponseWriter, r *http.Request) {
 //   - 500 Internal Server Error: Gagal menghitung pesan
 func (h *ChatHandler) GetUnreadCount(w http.ResponseWriter, r *http.Request) {
 	// Ambil user claims dari JWT token
-	claims, _ := r.Context().Value("user").(*service.Claims)
+	claims, ok := r.Context().Value("user").(*service.Claims)
+	if !ok || claims == nil {
+		http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
+		return
+	}
 
 	// Hitung jumlah pesan yang belum dibaca
 	count, err := h.chatRepo.CountUnread(r.Context(), claims.UserID)
