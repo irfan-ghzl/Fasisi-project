@@ -27,10 +27,35 @@ function App() {
     localStorage.setItem('currentUser', JSON.stringify(user));
     setIsAuthenticated(true);
     setCurrentUser(user);
+    
+    // Auto refresh token before expiration
+    startTokenRefresh();
+  };
+
+  const startTokenRefresh = () => {
+    // Refresh token every 14 minutes (before 15 min expiration)
+    const refreshInterval = setInterval(async () => {
+      try {
+        const refreshToken = localStorage.getItem('refreshToken');
+        if (!refreshToken) return;
+
+        const response = await axios.post('/api/auth/refresh', {
+          refresh_token: refreshToken
+        });
+
+        localStorage.setItem('authToken', response.data.token);
+      } catch (error) {
+        console.error('Token refresh failed:', error);
+        handleLogout(); // Logout if refresh fails
+      }
+    }, 14 * 60 * 1000); // 14 minutes
+
+    return () => clearInterval(refreshInterval);
   };
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('currentUser');
     setIsAuthenticated(false);
     setCurrentUser(null);

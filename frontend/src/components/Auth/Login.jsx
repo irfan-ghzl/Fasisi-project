@@ -20,6 +20,8 @@ function Login({ onLogin }) {
         password,
       });
 
+      // Store both access token and refresh token
+      localStorage.setItem('refreshToken', response.data.refresh_token);
       onLogin(response.data.token, response.data.user);
     } catch (err) {
       setError(err.response?.data?.error || 'Login gagal. Silakan coba lagi.');

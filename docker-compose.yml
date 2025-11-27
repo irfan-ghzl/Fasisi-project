@@ -4,9 +4,9 @@ services:
     image: postgres:15-alpine
     container_name: fasisi-postgres
     environment:
-      POSTGRES_USER: fasisi_user
-      POSTGRES_PASSWORD: fasisi_password
-      POSTGRES_DB: fasisi_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
@@ -26,13 +26,13 @@ services:
       dockerfile: Dockerfile
     container_name: fasisi-backend
     environment:
-      PORT: 8080
-      JWT_SECRET: dev-secret-key-change-in-production
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: fasisi_user
-      DB_PASSWORD: fasisi_password
-      DB_NAME: fasisi_db
+      PORT: ${PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
     ports:
       - "8080:8080"
     volumes:
