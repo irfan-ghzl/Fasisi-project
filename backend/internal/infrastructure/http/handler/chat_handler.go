@@ -9,22 +9,26 @@ import (
 	"github.com/irfan-ghzl/fasisi-backend/internal/domain/entity"
 	"github.com/irfan-ghzl/fasisi-backend/internal/domain/repository"
 	"github.com/irfan-ghzl/fasisi-backend/internal/domain/service"
+	"github.com/irfan-ghzl/fasisi-backend/internal/infrastructure/http/middleware"
 )
 
 // ChatHandler menangani semua request HTTP terkait fitur chat
 // Handler ini memfasilitasi komunikasi real-time antara dua pengguna (Irfan & Sisti)
 type ChatHandler struct {
-	chatRepo repository.ChatRepository // Repository untuk operasi database chat
+	chatRepo  repository.ChatRepository        // Repository untuk operasi database chat
+	notifRepo repository.NotificationRepository // Repository untuk notifikasi
 }
 
 // NewChatHandler membuat instance baru dari ChatHandler
 // Parameter:
 //   - chatRepo: Repository untuk mengakses data chat di database
+//   - notifRepo: Repository untuk notifikasi
 // Returns:
 //   - Pointer ke ChatHandler yang sudah diinisialisasi
-func NewChatHandler(chatRepo repository.ChatRepository) *ChatHandler {
+func NewChatHandler(chatRepo repository.ChatRepository, notifRepo repository.NotificationRepository) *ChatHandler {
 	return &ChatHandler{
-		chatRepo: chatRepo,
+		chatRepo:  chatRepo,
+		notifRepo: notifRepo,
 	}
 }
 
@@ -43,7 +47,7 @@ func NewChatHandler(chatRepo repository.ChatRepository) *ChatHandler {
 //   - 500 Internal Server Error: Gagal mengambil pesan dari database
 func (h *ChatHandler) GetHistory(w http.ResponseWriter, r *http.Request) {
 	// Ambil user claims dari context (sudah diset oleh auth middleware)
-	claims, ok := r.Context().Value("user").(*service.Claims)
+	claims, ok := r.Context().Value(middleware.UserContextKey).(*service.Claims)
 	if !ok || claims == nil {
 		http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
 		return
@@ -96,7 +100,7 @@ type SendMessageReq struct {
 //   - 500 Internal Server Error: Gagal menyimpan pesan ke database
 func (h *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 	// Ambil user claims dari JWT token
-	claims, ok := r.Context().Value("user").(*service.Claims)
+	claims, ok := r.Context().Value(middleware.UserContextKey).(*service.Claims)
 	if !ok || claims == nil {
 		http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
 		return
@@ -136,6 +140,16 @@ func (h *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Create notification for receiver
+	notif := &entity.Notification{
+		UserID:     receiverID,
+		Type:       entity.NotificationTypeNewMessage,
+		Message:    "Pesan baru dari " + claims.Username,
+		RelatedID:  chatMessage.ID,
+		ReadStatus: false,
+	}
+	h.notifRepo.Create(r.Context(), notif)
+
 	// Kirim response success
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
@@ -162,7 +176,7 @@ func (h *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 //   - 500 Internal Server Error: Gagal update status pesan
 func (h *ChatHandler) MarkAsRead(w http.ResponseWriter, r *http.Request) {
 	// Ambil user claims dari JWT token
-	claims, ok := r.Context().Value("user").(*service.Claims)
+	claims, ok := r.Context().Value(middleware.UserContextKey).(*service.Claims)
 	if !ok || claims == nil {
 		http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
 		return
@@ -208,7 +222,7 @@ func (h *ChatHandler) MarkAsRead(w http.ResponseWriter, r *http.Request) {
 //   - 500 Internal Server Error: Gagal menghitung pesan
 func (h *ChatHandler) GetUnreadCount(w http.ResponseWriter, r *http.Request) {
 	// Ambil user claims dari JWT token
-	claims, ok := r.Context().Value("user").(*service.Claims)
+	claims, ok := r.Context().Value(middleware.UserContextKey).(*service.Claims)
 	if !ok || claims == nil {
 		http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
 		return

@@ -14,6 +14,7 @@ func SetupRoutes(
 	galleryHandler *handler.GalleryHandler,
 	requestHandler *handler.RequestHandler,
 	chatHandler *handler.ChatHandler,
+	notificationHandler *handler.NotificationHandler,
 	authMiddleware func(http.Handler) http.Handler,
 	adminMiddleware func(http.Handler) http.Handler,
 ) *mux.Router {
@@ -30,6 +31,7 @@ func SetupRoutes(
 
 	// Auth routes
 	r.HandleFunc("/api/auth/login", authHandler.Login).Methods("POST")
+	r.HandleFunc("/api/auth/refresh", authHandler.RefreshToken).Methods("POST")
 	r.Handle("/api/auth/profile", authMiddleware(http.HandlerFunc(authHandler.GetProfile))).Methods("GET")
 
 	// Gallery routes
@@ -48,6 +50,11 @@ func SetupRoutes(
 	r.Handle("/api/chat/messages", authMiddleware(http.HandlerFunc(chatHandler.SendMessage))).Methods("POST")
 	r.Handle("/api/chat/messages/read", authMiddleware(http.HandlerFunc(chatHandler.MarkAsRead))).Methods("POST")
 	r.Handle("/api/chat/unread", authMiddleware(http.HandlerFunc(chatHandler.GetUnreadCount))).Methods("GET")
+
+	// Notification routes
+	r.Handle("/api/notifications", authMiddleware(http.HandlerFunc(notificationHandler.GetAll))).Methods("GET")
+	r.Handle("/api/notifications/unread", authMiddleware(http.HandlerFunc(notificationHandler.GetUnreadCount))).Methods("GET")
+	r.Handle("/api/notifications/read", authMiddleware(http.HandlerFunc(notificationHandler.MarkAsRead))).Methods("POST")
 
 	// Static files for uploads (gallery photos/videos)
 	// Serve files from ./uploads directory at /uploads URL path

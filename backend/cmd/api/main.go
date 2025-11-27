@@ -66,14 +66,15 @@ func main() {
 
 	// Initialize handlers
 	authHandler := handler.NewAuthHandler(userRepo, authService)
-	galleryHandler := handler.NewGalleryHandler(galleryRepo)
+	galleryHandler := handler.NewGalleryHandler(galleryRepo, notifRepo)
 	requestHandler := handler.NewRequestHandler(requestRepo, notifRepo)
-	chatHandler := handler.NewChatHandler(chatRepo)
+	chatHandler := handler.NewChatHandler(chatRepo, notifRepo)
+	notificationHandler := handler.NewNotificationHandler(notifRepo)
 
 	// Setup routes
 	authMiddleware := middleware.AuthMiddleware(authService)
 	adminMiddleware := middleware.AdminMiddleware
-	r := router.SetupRoutes(authHandler, galleryHandler, requestHandler, chatHandler, authMiddleware, adminMiddleware)
+	r := router.SetupRoutes(authHandler, galleryHandler, requestHandler, chatHandler, notificationHandler, authMiddleware, adminMiddleware)
 
 	// Start server
 	log.Printf("Server starting on port %s", cfg.ServerPort)

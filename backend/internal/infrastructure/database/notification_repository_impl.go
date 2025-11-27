@@ -17,7 +17,7 @@ func NewNotificationRepository(db *PostgresDB) repository.NotificationRepository
 }
 
 func (r *notificationRepository) FindByUserID(ctx context.Context, userID int64, limit int) ([]*entity.Notification, error) {
-	query := `SELECT id, user_id, type, message, read_status, sent_email, sent_sms, created_at 
+	query := `SELECT id, user_id, type, message, related_id, read_status, sent_email, sent_sms, created_at 
 			  FROM notifications WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2`
 
 	rows, err := r.db.DB.QueryContext(ctx, query, userID, limit)
@@ -30,7 +30,7 @@ func (r *notificationRepository) FindByUserID(ctx context.Context, userID int64,
 	for rows.Next() {
 		notif := &entity.Notification{}
 		err := rows.Scan(&notif.ID, &notif.UserID, &notif.Type, &notif.Message,
-			&notif.ReadStatus, &notif.SentEmail, &notif.SentSMS, &notif.CreatedAt)
+			&notif.RelatedID, &notif.ReadStatus, &notif.SentEmail, &notif.SentSMS, &notif.CreatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -41,11 +41,11 @@ func (r *notificationRepository) FindByUserID(ctx context.Context, userID int64,
 }
 
 func (r *notificationRepository) Create(ctx context.Context, notification *entity.Notification) error {
-	query := `INSERT INTO notifications (user_id, type, message, read_status, sent_email, sent_sms, created_at) 
-			  VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING id`
+	query := `INSERT INTO notifications (user_id, type, message, related_id, read_status, sent_email, sent_sms, created_at) 
+			  VALUES ($1, $2, $3, $4, $5, $6, $7, NOW()) RETURNING id`
 
 	err := r.db.DB.QueryRowContext(ctx, query,
-		notification.UserID, notification.Type, notification.Message,
+		notification.UserID, notification.Type, notification.Message, notification.RelatedID,
 		notification.ReadStatus, notification.SentEmail, notification.SentSMS,
 	).Scan(&notification.ID)
 

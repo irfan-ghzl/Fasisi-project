@@ -102,8 +102,7 @@ function Gallery({ user, onLogout }) {
 
       await axios.post('/api/gallery/upload', formData, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
+          'Authorization': `Bearer ${token}`
         }
       });
 

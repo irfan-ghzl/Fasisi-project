@@ -15,14 +15,19 @@ import (
 	"github.com/irfan-ghzl/fasisi-backend/internal/domain/entity"
 	"github.com/irfan-ghzl/fasisi-backend/internal/domain/repository"
 	"github.com/irfan-ghzl/fasisi-backend/internal/domain/service"
+	"github.com/irfan-ghzl/fasisi-backend/internal/infrastructure/http/middleware"
 )
 
 type GalleryHandler struct {
 	galleryRepo repository.GalleryRepository
+	notifRepo   repository.NotificationRepository
 }
 
-func NewGalleryHandler(galleryRepo repository.GalleryRepository) *GalleryHandler {
-	return &GalleryHandler{galleryRepo: galleryRepo}
+func NewGalleryHandler(galleryRepo repository.GalleryRepository, notifRepo repository.NotificationRepository) *GalleryHandler {
+	return &GalleryHandler{
+		galleryRepo: galleryRepo,
+		notifRepo:   notifRepo,
+	}
 }
 
 func (h *GalleryHandler) GetAll(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +54,7 @@ func (h *GalleryHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 // - Photos: JPEG, PNG, GIF
 // - Videos: MP4, MOV, AVI, WebM
 func (h *GalleryHandler) Create(w http.ResponseWriter, r *http.Request) {
-	claims, ok := r.Context().Value("user").(*service.Claims)
+	claims, ok := r.Context().Value(middleware.UserContextKey).(*service.Claims)
 	if !ok || claims == nil {
 		http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
 		return
@@ -136,6 +141,26 @@ func (h *GalleryHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Create notification for partner
+	partnerID := int64(1)
+	if claims.UserID == 1 {
+		partnerID = 2
+	}
+	
+	fileTypeStr := "foto"
+	if fileType == entity.FileTypeVideo {
+		fileTypeStr = "video"
+	}
+	
+	notif := &entity.Notification{
+		UserID:     partnerID,
+		Type:       entity.NotificationTypeGalleryUpload,
+		Message:    claims.Username + " menambahkan " + fileTypeStr + " baru ke galeri",
+		RelatedID:  gallery.ID,
+		ReadStatus: false,
+	}
+	h.notifRepo.Create(r.Context(), notif)
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]interface{}{
@@ -147,7 +172,7 @@ func (h *GalleryHandler) Create(w http.ResponseWriter, r *http.Request) {
 func (h *GalleryHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, _ := strconv.ParseInt(vars["id"], 10, 64)
-	claims, ok := r.Context().Value("user").(*service.Claims)
+	claims, ok := r.Context().Value(middleware.UserContextKey).(*service.Claims)
 	if !ok || claims == nil {
 		http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
 		return
