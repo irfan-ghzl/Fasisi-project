@@ -7,7 +7,6 @@ import Gallery from './components/Gallery/Gallery';
 import Requests from './components/Requests/Requests';
 import Chat from './components/Chat/Chat';
 import Notifications from './components/Notifications/Notifications';
-import './assets/css/App.css';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

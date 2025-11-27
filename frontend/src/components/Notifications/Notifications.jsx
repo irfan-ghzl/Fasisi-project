@@ -58,121 +58,60 @@ function Notifications({ user, onLogout }) {
   };
 
   return (
-    <div className="page-container">
-      <nav className="navbar">
-        <div className="nav-brand">❤️ Dating App</div>
-        <div className="nav-menu">
-          <Link to="/dashboard" className="nav-item">🏠 Dashboard</Link>
-          <Link to="/gallery" className="nav-item">📷 Galeri</Link>
-          <Link to="/requests" className="nav-item">🎯 Request</Link>
-          <Link to="/chat" className="nav-item">💬 Chat</Link>
-          <Link to="/notifications" className="nav-item active">🔔 Notifikasi</Link>
-          <button onClick={handleLogout} className="nav-item logout-btn">🚪 Logout</button>
+    <div className="min-h-screen bg-gradient-to-br from-primary to-secondary">
+      <nav className="bg-white py-4 px-8 flex justify-between items-center shadow-md flex-wrap gap-4">
+        <div className="text-2xl font-bold text-primary">❤️ Dating App</div>
+        <div className="flex gap-4 items-center flex-wrap justify-center">
+          <Link to="/dashboard" className="py-2 px-4 rounded-lg no-underline text-gray-500 transition-all duration-300 text-sm hover:bg-indigo-50 hover:text-primary">🏠 Dashboard</Link>
+          <Link to="/gallery" className="py-2 px-4 rounded-lg no-underline text-gray-500 transition-all duration-300 text-sm hover:bg-indigo-50 hover:text-primary">📷 Galeri</Link>
+          <Link to="/requests" className="py-2 px-4 rounded-lg no-underline text-gray-500 transition-all duration-300 text-sm hover:bg-indigo-50 hover:text-primary">🎯 Request</Link>
+          <Link to="/chat" className="py-2 px-4 rounded-lg no-underline text-gray-500 transition-all duration-300 text-sm hover:bg-indigo-50 hover:text-primary">💬 Chat</Link>
+          <Link to="/notifications" className="py-2 px-4 rounded-lg no-underline bg-primary text-white text-sm">🔔 Notifikasi</Link>
+          <button onClick={handleLogout} className="py-2 px-4 rounded-lg bg-transparent border-none cursor-pointer text-sm text-red-500 transition-all duration-300 hover:bg-red-50 hover:text-red-700">🚪 Logout</button>
         </div>
       </nav>
 
-      <div className="page-content">
-        <div className="page-header">
-          <h1>🔔 Notifikasi</h1>
+      <div className="p-10 max-w-6xl mx-auto">
+        <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
+          <h1 className="text-white text-3xl">🔔 Notifikasi</h1>
           {notifications.length > 0 && (
-            <button className="btn-secondary" onClick={markAllAsRead}>
+            <button 
+              className="bg-white text-primary border-2 border-primary py-2 px-5 rounded-lg text-sm cursor-pointer transition-all duration-300 hover:bg-primary hover:text-white"
+              onClick={markAllAsRead}
+            >
               Tandai Semua Dibaca
             </button>
           )}
         </div>
 
         {loading ? (
-          <div className="loading">Memuat notifikasi...</div>
+          <div className="text-center py-10 text-gray-200">Memuat notifikasi...</div>
         ) : notifications.length === 0 ? (
-          <div className="empty-state">
-            <p>Belum ada notifikasi</p>
+          <div className="text-center py-16 px-5 text-gray-200">
+            <p className="text-lg">Belum ada notifikasi</p>
           </div>
         ) : (
-          <div className="notifications-list">
+          <div className="flex flex-col gap-3">
             {notifications.map((notif) => (
               <div 
                 key={notif.id} 
-                className={`notification-item ${!notif.read_status ? 'unread' : ''}`}
+                className={`flex items-center gap-4 p-4 bg-white rounded-xl shadow-lg transition-all duration-300 relative hover:-translate-y-0.5 hover:shadow-xl ${!notif.read_status ? 'bg-orange-50 border-l-4 border-pink-400' : ''}`}
               >
-                <div className="notif-icon">
+                <div className="text-3xl flex-shrink-0">
                   {notif.type === 'new_message' && '💬'}
                   {notif.type === 'date_request' && '🎯'}
                   {notif.type === 'gallery_upload' && '📷'}
                 </div>
-                <div className="notif-content">
-                  <p className="notif-message">{notif.message}</p>
-                  <span className="notif-time">{formatDate(notif.created_at)}</span>
+                <div className="flex-1">
+                  <p className="m-0 mb-1 text-sm text-gray-800">{notif.message}</p>
+                  <span className="text-xs text-gray-500">{formatDate(notif.created_at)}</span>
                 </div>
-                {!notif.read_status && <div className="unread-badge"></div>}
+                {!notif.read_status && <div className="w-2.5 h-2.5 bg-pink-400 rounded-full flex-shrink-0"></div>}
               </div>
             ))}
           </div>
         )}
       </div>
-
-      <style jsx>{`
-        .notifications-list {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-
-        .notification-item {
-          display: flex;
-          align-items: center;
-          gap: 16px;
-          padding: 16px;
-          background: white;
-          border-radius: 12px;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-          transition: all 0.3s ease;
-          position: relative;
-        }
-
-        .notification-item.unread {
-          background: #fff3e0;
-          border-left: 4px solid #ff6b9d;
-        }
-
-        .notification-item:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        .notif-icon {
-          font-size: 32px;
-          flex-shrink: 0;
-        }
-
-        .notif-content {
-          flex: 1;
-        }
-
-        .notif-message {
-          margin: 0 0 4px 0;
-          font-size: 15px;
-          color: #333;
-        }
-
-        .notif-time {
-          font-size: 13px;
-          color: #666;
-        }
-
-        .unread-badge {
-          width: 10px;
-          height: 10px;
-          background: #ff6b9d;
-          border-radius: 50%;
-          flex-shrink: 0;
-        }
-
-        .loading {
-          text-align: center;
-          padding: 40px;
-          color: #666;
-        }
-      `}</style>
     </div>
   );
 }
